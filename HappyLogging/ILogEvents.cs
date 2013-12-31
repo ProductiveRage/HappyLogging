@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace HappyLogging.Loggers
+namespace HappyLogging
 {
     public interface ILogEvents
 	{

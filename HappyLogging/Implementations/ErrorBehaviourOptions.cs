@@ -1,4 +1,4 @@
-﻿namespace HappyLogging.Loggers
+﻿namespace HappyLogging.Implementations
 {
     public enum ErrorBehaviourOptions
     {

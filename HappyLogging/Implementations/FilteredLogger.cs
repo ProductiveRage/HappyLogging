@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace HappyLogging.Loggers
+namespace HappyLogging.Implementations
 {
     /// <summary>
     /// Write log messages to trace, including additional content such as date, time and thread id

@@ -39,20 +39,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Loggers\ConsoleLogger.cs" />
-    <Compile Include="Loggers\CombinedLogger.cs" />
-    <Compile Include="Loggers\ErrorWithBackTrackLogger.cs" />
-    <Compile Include="Loggers\MessageFormatting\DefaultMessageFormatter.cs" />
-    <Compile Include="Loggers\FileLogger.cs" />
-    <Compile Include="Loggers\FilteredLogger.cs" />
-    <Compile Include="Loggers\ErrorBehaviourOptions.cs" />
+    <Compile Include="Implementations\ConsoleLogger.cs" />
+    <Compile Include="Implementations\CombinedLogger.cs" />
+    <Compile Include="Implementations\ErrorWithBackTrackLogger.cs" />
+    <Compile Include="Implementations\MessageFormatting\DefaultMessageFormatter.cs" />
+    <Compile Include="Implementations\FileLogger.cs" />
+    <Compile Include="Implementations\FilteredLogger.cs" />
+    <Compile Include="Implementations\ErrorBehaviourOptions.cs" />
     <Compile Include="LogEventDetails.cs" />
-    <Compile Include="Loggers\NullLogger.cs" />
+    <Compile Include="Implementations\NullLogger.cs" />
     <Compile Include="LogLevel.cs" />
-    <Compile Include="Loggers\ILogEvents_Extensions.cs" />
-    <Compile Include="Loggers\ILogEvents.cs" />
+    <Compile Include="ILogEvents_Extensions.cs" />
+    <Compile Include="ILogEvents.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Loggers\ThrottlingLogger.cs" />
+    <Compile Include="Implementations\ThrottlingLogger.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

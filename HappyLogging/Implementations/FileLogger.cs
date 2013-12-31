@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace HappyLogging.Loggers
+namespace HappyLogging.Implementations
 {
     /// <summary>
     /// Append log messages to a file

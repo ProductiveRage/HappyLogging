@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 
-namespace HappyLogging.Loggers
+namespace HappyLogging
 {
     public static class ILogEvents_Extensions
 	{

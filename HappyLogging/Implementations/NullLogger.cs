@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace HappyLogging.Loggers
+namespace HappyLogging.Implementations
 {
     /// <summary>
     /// This should throw an exception for a null messages set but whether exceptions are thrown due to any other issues (eg. null references within the
