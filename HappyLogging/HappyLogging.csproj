@@ -42,6 +42,8 @@
     <Compile Include="Factories\DefaultLoggerFactory.cs" />
     <Compile Include="Implementations\ConsoleLogger.cs" />
     <Compile Include="Implementations\CombinedLogger.cs" />
+    <Compile Include="Implementations\TextLogger.cs" />
+    <Compile Include="Implementations\TraceLogger.cs" />
     <Compile Include="Implementations\ErrorWithBackTrackLogger.cs" />
     <Compile Include="Implementations\MessageFormatting\DefaultMessageFormatter.cs" />
     <Compile Include="Implementations\FileLogger.cs" />
