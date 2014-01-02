@@ -23,6 +23,7 @@ namespace HappyLogging.Implementations
         public ErrorWithBackTrackLogger(
             ILogEvents logger,
             int maximumNumberOfHistoricalMessagesToMaintain,
+            int maximumNumberOfHistoricalMessagesToIncludeWithAnErrorEntry,
             HistoryLoggingBehaviourOptions historyLoggingBehaviour,
             ErrorBehaviourOptions individualLogEntryErrorBehaviour)
         {
@@ -30,12 +31,15 @@ namespace HappyLogging.Implementations
                 throw new ArgumentNullException("logger");
             if (maximumNumberOfHistoricalMessagesToMaintain <= 0)
                 throw new ArgumentOutOfRangeException("maximumNumberOfHistoricalMessagesToMaintain", "must be greater than zero");
+            if (maximumNumberOfHistoricalMessagesToIncludeWithAnErrorEntry <= 0)
+                throw new ArgumentOutOfRangeException("maximumNumberOfHistoricalMessagesToIncludeWithAnErrorEntry", "must be greater than zero");
             if (!Enum.IsDefined(typeof(HistoryLoggingBehaviourOptions), historyLoggingBehaviour))
                 throw new ArgumentOutOfRangeException("historyLoggingBehaviour");
             if (!Enum.IsDefined(typeof(ErrorBehaviourOptions), individualLogEntryErrorBehaviour))
                 throw new ArgumentOutOfRangeException("individualLogEntryErrorBehaviour");
 
             MaximumNumberOfHistoricalMessagesToMaintain = maximumNumberOfHistoricalMessagesToMaintain;
+            MaximumNumberOfHistoricalMessagesToIncludeWithAnErrorEntry = maximumNumberOfHistoricalMessagesToIncludeWithAnErrorEntry;
             HistoryLoggingBehaviour = historyLoggingBehaviour;
             IndividualLogEntryErrorBehaviour = individualLogEntryErrorBehaviour;
             
@@ -45,13 +49,15 @@ namespace HappyLogging.Implementations
         public ErrorWithBackTrackLogger(ILogEvents logger) : this(
             logger,
             Defaults.MaximumNumberOfHistoricalMessagesToMaintain,
+            Defaults.MaximumNumberOfHistoricalMessagesToIncludeWithAnErrorEntry,
             Defaults.HistoryLoggingBehaviourOptions,
             Defaults.IndividualLogEntryErrorBehaviour) { }
 
         public static class Defaults
         {
             public static int MaximumNumberOfHistoricalMessagesToMaintain { get { return 1000; } }
-            public static HistoryLoggingBehaviourOptions HistoryLoggingBehaviourOptions { get { return HistoryLoggingBehaviourOptions.IncludeAllPrecedingMessages; } }
+            public static int MaximumNumberOfHistoricalMessagesToIncludeWithAnErrorEntry { get { return 100; } }
+            public static HistoryLoggingBehaviourOptions HistoryLoggingBehaviourOptions { get { return HistoryLoggingBehaviourOptions.IncludePrecedingMessagesFromTheSameThreadOnly; } }
             public static ErrorBehaviourOptions IndividualLogEntryErrorBehaviour { get { return ErrorBehaviourOptions.Ignore; } }
         }
 
@@ -62,9 +68,16 @@ namespace HappyLogging.Implementations
         }
 
         /// <summary>
-        /// This will always be greater than zero
+        /// This is the total number of log entries that will be maintained in memory to be logged with any errors. If HistoryLoggingBehaviour is set to
+        /// IncludePrecedingMessagesFromTheSameThreadOnly then this would likely be greater than MaximumNumberOfHistoricalMessagesToIncludeWithAnErrorEntry
+        /// so that it is large enough to contain at least some history about all executing requests. This will always be greater than zero.
         /// </summary>
         public int MaximumNumberOfHistoricalMessagesToMaintain { get; private set; }
+
+        /// <summary>
+        /// This will always be greater than zero
+        /// </summary>
+        public int MaximumNumberOfHistoricalMessagesToIncludeWithAnErrorEntry { get; private set; }
 
         public HistoryLoggingBehaviourOptions HistoryLoggingBehaviour { get; private set; }
 
@@ -93,7 +106,18 @@ namespace HappyLogging.Implementations
                         :_messages.Where(m => m.ManagedThreadId == message.ManagedThreadId);
                     if (historicalMessagesToIncludeWithError.Any())
                     {
-                        messagesToPassThrough.AddRange(historicalMessagesToIncludeWithError);
+                        var historicalMessagesToIncludeWithErrorArray = historicalMessagesToIncludeWithError.ToArray();
+                        if (historicalMessagesToIncludeWithErrorArray.Length > MaximumNumberOfHistoricalMessagesToMaintain)
+                        {
+                            messagesToPassThrough.AddRange(
+                                historicalMessagesToIncludeWithErrorArray.Skip(
+                                    MaximumNumberOfHistoricalMessagesToIncludeWithAnErrorEntry - historicalMessagesToIncludeWithErrorArray.Length
+                                )
+                            );
+                        }
+                        else
+                            messagesToPassThrough.AddRange(historicalMessagesToIncludeWithErrorArray);
+
                         var historicalMessagesLookup = new HashSet<LogEventDetails>(historicalMessagesToIncludeWithError);
                         var messagesToKeep = _messages.Where(m => !historicalMessagesLookup.Contains(m)).ToArray();
                         _messages.Clear();
