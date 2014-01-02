@@ -1,55 +1,62 @@
 ﻿using HappyLogging.Implementations;
-using HappyLogging.Implementations.MessageFormatting;
 using System;
 using System.IO;
 
 namespace HappyLogging.Factories
 {
     /// <summary>
-    /// These loggers demonstrate some of the functionality of the library
-    /// All of these loggers use the ThrottlingLogger class and so are intended to operate with a single logger instance shared across all requests
+    /// These loggers demonstrate some of the functionality of the library. They buffer up messages before writing to disk but send them to the Trace in
+    /// real time. All of these loggers use the ThrottlingLogger class and so are intended to operate with a single logger instance shared across all
+    /// requests.
     /// </summary>
     public static class DefaultLoggerFactory
     {
         /// <summary>
-        /// This will log all messages with LogLevel Info, Warning or Error to disk with a filename that appends today's date to between the file
-        /// name and extension of the specified FileInfo
+        /// This will log all messages to disk with a filename that appends today's date to between the file name and extension of the specified FileInfo.
+        /// Messages with Info, Warning and Error levels are written to the Trace in real time (though they are buffered up to cut down on file IO).
         /// </summary>
         public static ILogEvents DailyLogger(FileInfo fileBase)
         {
             if (fileBase == null)
                 throw new ArgumentNullException("fileBase");
 
-            return DailyLogger(fileBase, null, LogLevelFilteringOptions.InfoAndMoreSevere);
+            return CombineWithTraceLogger(
+                DailyLogger(fileBase, null, LogLevelFilteringOptions.IncludeAllMessages)
+            );
         }
 
         /// <summary>
-        /// This will log all messages with LogLevel Info, Warning or Error to disk with a filename that appends today's date to between the file
-        /// name and extension of the specified FileInfo. If that file exceeds the specified targetMaximumFileSizeInBytes then subsequent files
-        /// will be created that append an index after the date.
+        /// This will log all messages to disk with a filename that appends today's date to between the file name and extension of the specified FileInfo.
+        /// If that file exceeds the specified targetMaximumFileSizeInBytes then subsequent files will be created that append an index after the date.
+        /// Messages with Info, Warning and Error levels are written to the Trace in real time (though they are buffered up to cut down on file IO).
         /// </summary>
-        public static ILogEvents DailyLogger(FileInfo fileBase, int targetMaximumFileSizeInBytes, LogLevelFilteringOptions logLevelFilteringOptions)
+        public static ILogEvents DailyLogger(FileInfo fileBase, int targetMaximumFileSizeInBytes)
         {
             if (fileBase == null)
                 throw new ArgumentNullException("fileBase");
             if (targetMaximumFileSizeInBytes <= 0)
                 throw new ArgumentOutOfRangeException("targetMaximumFileSizeInBytes");
 
-            return DailyLogger(fileBase, targetMaximumFileSizeInBytes, LogLevelFilteringOptions.InfoAndMoreSevere);
+            return CombineWithTraceLogger(
+                DailyLogger(fileBase, targetMaximumFileSizeInBytes, LogLevelFilteringOptions.IncludeAllMessages)
+            );
         }
 
         /// <summary>
-        /// This will not log anything until a message with Error log level is received, at which point it will write recent Debug, Info and Warning
-        /// messages that were recorded on the same thread before the Error message is written. The hope being that these messages will offer helpful
-        /// context for the error without detailed logs having to be written at all times. The log will be written to disk with a filename that appends
-        /// today's date to between the file name and extension of the specified FileInfo.
+        /// This will not log anything to disk until a message with Error log level is received, at which point it will write all recent messages that
+        /// were recorded on the same thread before the Error message is written. The hope being that these messages will offer helpful context for the
+        /// error without detailed logs having to be written at all times. The log will be written to disk with a filename that appends today's date to
+        /// between the file name and extension of the specified FileInfo. Messages with Info, Warning and Error levels are written to the Trace in real
+        /// time (though they are buffered up to cut down on file IO).
         /// </summary>
         public static ILogEvents DailyErrorLogger(FileInfo fileBase)
         {
             if (fileBase == null)
                 throw new ArgumentNullException("fileBase");
 
-            return DailyLogger(fileBase, null, LogLevelFilteringOptions.ErrorOnly);
+            return CombineWithTraceLogger(
+                DailyLogger(fileBase, null, LogLevelFilteringOptions.ErrorOnly)
+            );
         }
 
         private static ILogEvents DailyLogger(FileInfo fileBase, int? targetMaximumFileSizeInBytes, LogLevelFilteringOptions logLevelFilteringOptions)
@@ -58,7 +65,7 @@ namespace HappyLogging.Factories
                 throw new ArgumentNullException("fileBase");
             if ((targetMaximumFileSizeInBytes != null) && (targetMaximumFileSizeInBytes.Value <= 0))
                 throw new ArgumentOutOfRangeException("targetMaximumFileSizeInBytes");
-            if ((logLevelFilteringOptions != LogLevelFilteringOptions.ErrorOnly) && (logLevelFilteringOptions != LogLevelFilteringOptions.InfoAndMoreSevere))
+            if ((logLevelFilteringOptions != LogLevelFilteringOptions.ErrorOnly) && (logLevelFilteringOptions != LogLevelFilteringOptions.IncludeAllMessages))
                 throw new ArgumentOutOfRangeException("logLevelFilteringOptions");
 
             var extension = fileBase.Extension; // Note: This will include the dot (eg. ".txt")
@@ -94,9 +101,7 @@ namespace HappyLogging.Factories
             // it should probably be fine as a starting point.
             if (logLevelFilteringOptions == LogLevelFilteringOptions.ErrorOnly)
                 logger = new ErrorWithBackTrackLogger(logger);
-            else
-                logger = new FilteredLogger(logger, LogLevel.Info, LogLevel.Warning, LogLevel.Error);
-            
+ 
             // The ThrottlingLogger's default behaviour is to queue up no more than 50 messages but to otherwise log no more than every two seconds.
             // This compromise works well if a targetMaximumFileSizeInBytes is specified as it means that the file should not exceed the target
             // maximum by too much but the IO overhead of identifying the correct file to write is not done for each log request. If the current
@@ -109,7 +114,18 @@ namespace HappyLogging.Factories
         private enum LogLevelFilteringOptions
         {
             ErrorOnly,
-            InfoAndMoreSevere
+            IncludeAllMessages
+        }
+
+        private static ILogEvents CombineWithTraceLogger(ILogEvents logger)
+        {
+            if (logger == null)
+                throw new ArgumentNullException("logger");
+
+            return new CombinedLogger(
+                logger,
+                new FilteredLogger(new TraceLogger(), LogLevel.Info, LogLevel.Warning, LogLevel.Error)
+            );
         }
     }
 }
