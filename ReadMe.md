@@ -6,7 +6,7 @@ Sometimes I just want to push messages to the console. Sometimes I want to push 
 
 Any class or method that requires this logging should take an **ILogEvents** reference (that can be provided by your favourite Dependency Injection framework, if you're into that sort of thing). There are then extension methods to try to make logging as simple as possible - eg.
 
-    logger.LogIgnoringAnyError(LogLevel.Warning, () => "I don't know what's happening!");
+    logger.LogIgnoringAnyError(LogLevel.Warning, () => "Something bad going on!");
 
 **LogLevel** is an enum with the values Debug, Info, Warning and Error. The delegate is to delay the generation of messages. The "LogIgnoringAnyError" methods wrap the work in a try..catch in case anything goes wrong during the logging - my logic being that if logging has failed, what are you going to? Log the failure??
 
