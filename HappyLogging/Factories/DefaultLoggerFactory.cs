@@ -122,9 +122,18 @@ namespace HappyLogging.Factories
             if (logger == null)
                 throw new ArgumentNullException("logger");
 
+            // Note: Here an AsyncLogger is used just so that the log writer needn't worry about waiting for any trace listeners to deal with the
+            // messages being broadcast, they can just carry on with their real work and the listeners will get the data on a separate thread
             return new CombinedLogger(
                 logger,
-                new FilteredLogger(new TraceLogger(), LogLevel.Info, LogLevel.Warning, LogLevel.Error)
+                new AsyncLogger(
+                    new FilteredLogger(
+                        new TraceLogger(),
+                        LogLevel.Info,
+                        LogLevel.Warning,
+                        LogLevel.Error
+                    )
+                )
             );
         }
     }

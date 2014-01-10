@@ -40,6 +40,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Factories\DefaultLoggerFactory.cs" />
+    <Compile Include="Implementations\AsyncLogger.cs" />
     <Compile Include="Implementations\ConsoleLogger.cs" />
     <Compile Include="Implementations\CombinedLogger.cs" />
     <Compile Include="Implementations\TextLogger.cs" />
