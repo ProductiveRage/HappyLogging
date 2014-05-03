@@ -24,7 +24,7 @@ namespace HappyLogging
 
             try
             {
-                logger.Log(logLevel, logDate, managedThreadId, contentGenerator, exception);
+                Log(logger, logLevel, logDate, managedThreadId, contentGenerator, exception);
             }
             catch { }
         }
@@ -38,11 +38,7 @@ namespace HappyLogging
             if (logger == null)
                 throw new ArgumentNullException("logger");
 
-            try
-            {
-                logger.Log(logLevel, DateTime.Now, Thread.CurrentThread.ManagedThreadId, contentGenerator, exception);
-            }
-            catch { }
+            LogIgnoringAnyError(logger, logLevel, DateTime.Now, Thread.CurrentThread.ManagedThreadId, contentGenerator, exception);
         }
 
         /// <summary>
