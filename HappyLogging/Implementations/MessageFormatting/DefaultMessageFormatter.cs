@@ -43,10 +43,19 @@ namespace HappyLogging.Implementations.MessageFormatting
                 // Don't bother displaying the text "Info", it's redundant (Debug, Warning or Error are useful content, though)
                 detailedContent.AppendFormat("[{0}] ", message.LogLevel.ToString());
             }
-            detailedContent.Append(message.ContentGenerator());
+            var content = message.ContentGenerator();
+            if (string.IsNullOrWhiteSpace(content))
+            {
+                if (message.OptionalException == null)
+                    detailedContent.Append("{Empty Message}");
+            }
+            else
+                detailedContent.Append(content);
             if (message.OptionalException != null)
             {
-                detailedContent.AppendFormat(" - {0}", message.OptionalException.Message);
+                if (!string.IsNullOrWhiteSpace(content))
+                    detailedContent.Append(" - ");
+                detailedContent.Append(message.OptionalException.Message);
                 detailedContent.AppendLine();
                 detailedContent.Append(message.OptionalException.StackTrace);
                 var baseException = message.OptionalException.GetBaseException();

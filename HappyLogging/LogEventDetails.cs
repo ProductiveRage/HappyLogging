@@ -10,9 +10,6 @@ namespace HappyLogging
                 throw new ArgumentOutOfRangeException("logLevel");
             if (contentGenerator == null)
                 throw new ArgumentNullException("contentGenerator");
-            var content = contentGenerator();
-            if (string.IsNullOrWhiteSpace(content))
-                throw new ArgumentException("Null/empty content specified");
 
             LogLevel = logLevel;
             LogDate = logDate;
