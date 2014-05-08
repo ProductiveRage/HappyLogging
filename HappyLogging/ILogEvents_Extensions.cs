@@ -52,5 +52,22 @@ namespace HappyLogging
 
             LogIgnoringAnyError(logger, logLevel, contentGenerator, null);
         }
-	}
+
+        /// <summary>
+        /// Wrap logging request in a try..catch and swallow any exception - this is an extension method that guarantees the exception will be caught, regardless
+        /// of the logger implementation.
+        /// </summary>
+        public static void LogIgnoringAnyError(this ILogEvents logger, Exception error)
+        {
+            if (logger == null)
+                throw new ArgumentNullException("logger");
+
+            // If there's no error then there's nothing to log, but this method is not supposed to throw an error when operating against a logger
+            // implementation (which is why the ArgumentNullException above is acceptable) so if error is null then do nothing
+            if (error == null)
+                return;
+
+            LogIgnoringAnyError(logger, LogLevel.Error, () => "", error);
+        }
+    }
 }
