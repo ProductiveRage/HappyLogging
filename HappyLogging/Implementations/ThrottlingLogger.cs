@@ -17,10 +17,14 @@ namespace HappyLogging.Implementations
         private readonly ILogEvents _logger;
         private readonly ConcurrentQueue<LogEventDetails> _messages;
         private readonly PauseableTimer _timer;
-        private readonly ErrorBehaviourOptions _individualLogEntryErrorBehaviour;
         private DateTime? _lastFlushedAt;
         private int _flushInProgressIndicator;
-        public ThrottlingLogger(ILogEvents logger, TimeSpan mimimumFrequency, int maximumNumberOfBufferedItems, ErrorBehaviourOptions individualLogEntryErrorBehaviour)
+        public ThrottlingLogger(
+            ILogEvents logger,
+            TimeSpan mimimumFrequency,
+            int maximumNumberOfBufferedItems,
+            MessageEvaluationBehaviourOptions messageEvaluationBehaviour,
+            ErrorBehaviourOptions individualLogEntryErrorBehaviour)
         {
             if (logger == null)
                 throw new ArgumentNullException("logger");
@@ -28,11 +32,14 @@ namespace HappyLogging.Implementations
                 throw new ArgumentOutOfRangeException("mimimumFrequency", "must be a positive duration");
             if (maximumNumberOfBufferedItems <= 0)
                 throw new ArgumentOutOfRangeException("maximumNumberOfBufferedItems", "must be a positive value");
+            if (!Enum.IsDefined(typeof(MessageEvaluationBehaviourOptions), messageEvaluationBehaviour))
+                throw new ArgumentOutOfRangeException("messageEvaluationBehaviour");
             if (!Enum.IsDefined(typeof(ErrorBehaviourOptions), individualLogEntryErrorBehaviour))
                 throw new ArgumentOutOfRangeException("individualLogEntryErrorBehaviour");
 
             MaximumNumberOfBufferedItems = maximumNumberOfBufferedItems;
             MinimumFrequency = mimimumFrequency;
+            MessageEvaluationBehaviour = messageEvaluationBehaviour;
             IndividualLogEntryErrorBehaviour = individualLogEntryErrorBehaviour;
 
             _logger = logger;
@@ -41,17 +48,40 @@ namespace HappyLogging.Implementations
                 mimimumFrequency,
                 FlushQueueIfNotAlreadyDoingSo
             );
-            _individualLogEntryErrorBehaviour = individualLogEntryErrorBehaviour;
             _lastFlushedAt = null;
             _flushInProgressIndicator = 0;
         }
-        public ThrottlingLogger(ILogEvents logger) : this(logger, Defaults.MimimumFrequency, Defaults.MaximumNumberOfBufferedItems, Defaults.IndividualLogEntryErrorBehaviour) { }
+        public ThrottlingLogger(ILogEvents logger) : this(
+            logger,
+            Defaults.MimimumFrequency,
+            Defaults.MaximumNumberOfBufferedItems,
+            Defaults.MessageEvaluationBehaviour,
+            Defaults.IndividualLogEntryErrorBehaviour) { }
 
         public static class Defaults
         {
             public static TimeSpan MimimumFrequency { get { return TimeSpan.FromSeconds(2); } }
             public static int MaximumNumberOfBufferedItems { get { return 50; } }
+            public static MessageEvaluationBehaviourOptions MessageEvaluationBehaviour { get { return MessageEvaluationBehaviourOptions.EvaluateWhenQueued; } }
             public static ErrorBehaviourOptions IndividualLogEntryErrorBehaviour { get { return ErrorBehaviourOptions.Ignore; } }
+        }
+
+        public enum MessageEvaluationBehaviourOptions
+        {
+            /// <summary>
+            /// The message's content will only be evaluated when it is written. This guarantees that the evaluation will only happen when the log is definitely
+            /// being written and it means that the work will be performed on a thread other than the caller's, which puts less load on the caller. However, if
+            /// the content refers to something that is mutated between the message's creation and its being written (or to something that is disposed) then
+            /// the message evaulation may be inaccurate or fail entirely.
+            /// </summary>
+            EvaluateWhenLogged,
+            
+            /// <summary>
+            /// The message will be replaced by an instance where the content has been evaluated, to avoid potential concurrency issues with it being evaluated
+            /// at a later time. This should be considered the default option in the interests of safety, the benefit of lazy evaluation may still be enjoyed
+            /// if this logger implementation is behind a filtered logger.
+            /// </summary>
+            EvaluateWhenQueued
         }
 
         /// <summary>
@@ -64,6 +94,8 @@ namespace HappyLogging.Implementations
         /// </summary>
         public TimeSpan MinimumFrequency { get; private set; }
 
+        public MessageEvaluationBehaviourOptions MessageEvaluationBehaviour { get; private set; }
+        
         public ErrorBehaviourOptions IndividualLogEntryErrorBehaviour { get; private set; }
 
         /// <summary>
@@ -112,7 +144,33 @@ namespace HappyLogging.Implementations
             {
                 if ((message == null) && (IndividualLogEntryErrorBehaviour == ErrorBehaviourOptions.ThrowException))
                     throw new ArgumentException("Null reference encountered in messages set");
-                _messages.Enqueue(message);
+
+                if (MessageEvaluationBehaviour == MessageEvaluationBehaviourOptions.EvaluateWhenLogged)
+                {
+                    _messages.Enqueue(message);
+                    continue;
+                }
+
+                string messageContents;
+                try
+                {
+                    messageContents = message.ContentGenerator();
+                }
+                catch
+                {
+                    if (IndividualLogEntryErrorBehaviour == ErrorBehaviourOptions.ThrowException)
+                        throw;
+                    continue;
+                }
+                _messages.Enqueue(
+                    new LogEventDetails(
+                        message.LogLevel,
+                        message.LogDate,
+                        message.ManagedThreadId,
+                        () => messageContents,
+                        message.OptionalException
+                    )
+                );
             }
             if (_messages.Count > MaximumNumberOfBufferedItems)
                 FlushQueueIfNotAlreadyDoingSo();

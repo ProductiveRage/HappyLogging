@@ -9,6 +9,13 @@ namespace HappyLogging.Implementations
     /// </summary>
     public class AsyncLogger : ThrottlingLogger
     {
-        public AsyncLogger(ILogEvents logger) : base(logger, TimeSpan.FromMilliseconds(500), 5, ErrorBehaviourOptions.Ignore) { }
+        public AsyncLogger(ILogEvents logger)
+            : base(
+                logger,
+                TimeSpan.FromMilliseconds(500), // Minimum off-loading frequency
+                5, // Maximum buffer size
+                ThrottlingLogger.Defaults.MessageEvaluationBehaviour,
+                ThrottlingLogger.Defaults.IndividualLogEntryErrorBehaviour
+            ) { }
     }
 }
