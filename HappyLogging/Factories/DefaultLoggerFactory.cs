@@ -66,7 +66,7 @@ namespace HappyLogging.Factories
 			if ((targetMaximumFileSizeInBytes != null) && (targetMaximumFileSizeInBytes.Value <= 0))
 				throw new ArgumentOutOfRangeException(nameof(targetMaximumFileSizeInBytes));
 			if ((logLevelFilteringOptions != LogLevelFilteringOptions.ErrorOnly) && (logLevelFilteringOptions != LogLevelFilteringOptions.IncludeAllMessages))
-				throw new ArgumentOutOfRangeException(logLevelFilteringOptions));
+				throw new ArgumentOutOfRangeException(nameof(logLevelFilteringOptions));
 
 			var extension = fileBase.Extension; // Note: This will include the dot (eg. ".txt")
 			var filenameWithoutExtension = fileBase.FullName.Substring(0, fileBase.FullName.Length - extension.Length);
