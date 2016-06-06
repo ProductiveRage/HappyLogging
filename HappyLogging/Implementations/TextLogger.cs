@@ -46,7 +46,6 @@ namespace HappyLogging
 			if (message == null)
 				throw new ArgumentNullException(nameof(message));
 
-			var combinedContentBuilder = new StringBuilder();
 			string messageContentToDisplay;
 			try
 			{
@@ -62,7 +61,7 @@ namespace HappyLogging
 			}
 			if (messageContentToDisplay == "")
 				return;
-			_outputWriter(combinedContentBuilder.ToString());
+			_outputWriter(messageContentToDisplay.ToString());
 		}
 
 		/// <summary>
