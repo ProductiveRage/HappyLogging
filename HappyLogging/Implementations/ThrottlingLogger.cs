@@ -145,18 +145,20 @@ namespace HappyLogging.Implementations
 				if ((message == null) && (IndividualLogEntryErrorBehaviour == ErrorBehaviourOptions.ThrowException))
 					throw new ArgumentException("Null reference encountered in messages set");
 
-				if (MessageEvaluationBehaviour == MessageEvaluationBehaviourOptions.EvaluateWhenLogged)
+				// If the message is to be evaluated when it's actually logged (which may be in the future), as opposed to when it's queued (which is right now)
+				// the push it straight onto the queue. Or, if the content is a string and not a lazily-evaluating Func then we can also queue it immediately.
+				if ((MessageEvaluationBehaviour == MessageEvaluationBehaviourOptions.EvaluateWhenLogged) || (message.ContentGenerator == null))
 				{
 					_messages.Enqueue(message);
 					continue;
 				}
 
-				// Because this message isn't going to be logged immediately, we need to evaulate the ContentGenerator (if there is one) in case there is any
-				// content that is time dependent (eg. "time to complete = {x}ms") or in case there are any references that might be disposed of between now
-				// (the time at which the message was created) and when it will actually be recorded. Note: Just because the message content is being evaluated
-				// immediately doesn't negate the benefit of a content generator delegate, there could be relative-expensive-to-log messages that should only
-				// be written away in debug mode, which case a FilteredLogger might wrap a ThrottlingLogger instance so that the messages are only evaluated
-				// if Debug-level messages are allowed through the filter.
+				// If the message is to be evaluated when queued (ie. right now) then we need to evaulate the ContentGenerator. This will be desirable if there
+				// is any content that is time dependent (eg. "time to complete = {x}ms") or in cases where there are any references that are required by the
+				// message evaluation that might be disposed of between now and when the message is recorded. Note: Just because the message content is being
+				// evaluated immediately doesn't negate the benefit of a content generator delegate, there could be relative-expensive-to-log messages that
+				// should only be written away in debug mode, which case a FilteredLogger might wrap a ThrottlingLogger instance so that the messages are only
+				// evaluated if Debug-level messages are allowed through the filter.
 				string messageContents;
 				if (message.Content != null)
 					messageContents = message.Content;
