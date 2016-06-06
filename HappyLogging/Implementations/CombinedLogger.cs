@@ -13,8 +13,12 @@ namespace HappyLogging.Implementations
 		{
 			if (loggers == null)
 				throw new ArgumentNullException(nameof(loggers));
-			if (!Enum.IsDefined(typeof(ErrorBehaviourOptions), individualLoggerErrorBehaviour))
+			if ((individualLoggerErrorBehaviour != ErrorBehaviourOptions.Ignore) && (individualLoggerErrorBehaviour != ErrorBehaviourOptions.ThrowException))
+			{
+				// Note: Explicitly check for all valid values rather than using Enum.IsDefined since IsDefined uses reflection and logging should be as cheap as possible
+				// (so reflection is best avoided)
 				throw new ArgumentOutOfRangeException(nameof(individualLoggerErrorBehaviour));
+			}
 
 			Loggers = loggers.ToList().AsReadOnly();
 			if (Loggers.Any(logger => logger == null))

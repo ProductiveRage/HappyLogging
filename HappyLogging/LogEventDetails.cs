@@ -21,7 +21,7 @@ namespace HappyLogging
 		}
 		private LogEventDetails(LogLevel logLevel, DateTime logDate, int managedThreadId, Exception optionalException)
 		{
-			// Note: Explicitly check for all valid values rather than usign Enum.IsDefined since IsDefined uses reflection and logging should be as cheap as possible (so
+			// Note: Explicitly check for all valid values rather than using Enum.IsDefined since IsDefined uses reflection and logging should be as cheap as possible (so
 			// reflection is best avoided)
 			if ((logLevel != LogLevel.Debug) && (logLevel != LogLevel.Info) && (logLevel != LogLevel.Warning) && (logLevel != LogLevel.Error))
 				throw new ArgumentOutOfRangeException(nameof(logLevel));

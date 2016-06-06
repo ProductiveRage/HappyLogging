@@ -17,8 +17,12 @@ namespace HappyLogging.Implementations
 				throw new ArgumentNullException(nameof(messageFormatter));
 			if (outputWriter == null)
 				throw new ArgumentNullException(nameof(outputWriter));
-			if (!Enum.IsDefined(typeof(ErrorBehaviourOptions), individualLogEntryErrorBehaviour))
+			if ((individualLogEntryErrorBehaviour != ErrorBehaviourOptions.Ignore) && (individualLogEntryErrorBehaviour != ErrorBehaviourOptions.ThrowException))
+			{
+				// Note: Explicitly check for all valid values rather than using Enum.IsDefined since IsDefined uses reflection and logging should be as cheap as possible
+				// (so reflection is best avoided)
 				throw new ArgumentOutOfRangeException(nameof(individualLogEntryErrorBehaviour));
+			}
 
 			IndividualLogEntryErrorBehaviour = individualLogEntryErrorBehaviour;
 			_messageFormatter = messageFormatter;

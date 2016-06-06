@@ -16,16 +16,23 @@ namespace HappyLogging.Implementations
 				throw new ArgumentNullException(nameof(logger));
 			if (allowedLogLevels == null)
 				throw new ArgumentNullException(nameof(allowedLogLevels));
-			if (!Enum.IsDefined(typeof(ErrorBehaviourOptions), individualLogEntryErrorBehaviour))
-				throw new ArgumentOutOfRangeException("individualLogEntryErrorBehaviour");
+			if ((individualLogEntryErrorBehaviour != ErrorBehaviourOptions.Ignore) && (individualLogEntryErrorBehaviour != ErrorBehaviourOptions.ThrowException))
+			{
+				// Note: Explicitly check for all valid values rather than using Enum.IsDefined since IsDefined uses reflection and logging should be as cheap as possible
+				// (so reflection is best avoided)
+				throw new ArgumentOutOfRangeException(nameof(individualLogEntryErrorBehaviour));
+			}
 
 			IndividualLogEntryErrorBehaviour = individualLogEntryErrorBehaviour;
 
 			_logger = logger;
 			AllowedLogLevels = allowedLogLevels.ToList().AsReadOnly();
-			if (AllowedLogLevels.Any(l => !Enum.IsDefined(typeof(LogLevel), l)))
+			foreach (var allowedLogLevel in AllowedLogLevels)
+			{
+				if ((allowedLogLevel != LogLevel.Debug) && (allowedLogLevel != LogLevel.Info) && (allowedLogLevel != LogLevel.Warning) && (allowedLogLevel != LogLevel.Error))
 					throw new ArgumentException("Invalid LogLevel value specified");
 			}
+		}
 		public FilteredLogger(ILogEvents logger, IEnumerable<LogLevel> allowedLogLevels) : this(logger, allowedLogLevels, Defaults.IndividualLogEntryErrorBehaviour) { }
 		public FilteredLogger(ILogEvents logger, params LogLevel[] allowedLogLevels) : this(logger, (IEnumerable<LogLevel>)allowedLogLevels) { }
 

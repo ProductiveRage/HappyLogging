@@ -32,9 +32,16 @@ namespace HappyLogging.Implementations
 				throw new ArgumentOutOfRangeException(nameof(mimimumFrequency), "must be a positive duration");
 			if (maximumNumberOfBufferedItems <= 0)
 				throw new ArgumentOutOfRangeException(nameof(maximumNumberOfBufferedItems), "must be a positive value");
-			if (!Enum.IsDefined(typeof(MessageEvaluationBehaviourOptions), messageEvaluationBehaviour))
+			if ((messageEvaluationBehaviour != MessageEvaluationBehaviourOptions.EvaluateWhenLogged) && (messageEvaluationBehaviour != MessageEvaluationBehaviourOptions.EvaluateWhenQueued))
+			{
+				// Note: Explicitly check for all valid values rather than using Enum.IsDefined since IsDefined uses reflection and logging should be as cheap as possible
+				// (so reflection is best avoided)
 				throw new ArgumentOutOfRangeException(nameof(messageEvaluationBehaviour));
-			if (!Enum.IsDefined(typeof(ErrorBehaviourOptions), individualLogEntryErrorBehaviour))
+			}
+			if ((individualLogEntryErrorBehaviour != ErrorBehaviourOptions.Ignore) && (individualLogEntryErrorBehaviour != ErrorBehaviourOptions.ThrowException))
+			{
+				// Note: Explicitly check for all valid values rather than using Enum.IsDefined since IsDefined uses reflection and logging should be as cheap as possible
+				// (so reflection is best avoided)
 				throw new ArgumentOutOfRangeException(nameof(individualLogEntryErrorBehaviour));
 			}
 

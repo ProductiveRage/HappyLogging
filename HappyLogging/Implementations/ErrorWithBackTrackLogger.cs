@@ -33,10 +33,18 @@ namespace HappyLogging.Implementations
 				throw new ArgumentOutOfRangeException(nameof(maximumNumberOfHistoricalMessagesToMaintain), "must be greater than zero");
 			if (maximumNumberOfHistoricalMessagesToIncludeWithAnErrorEntry <= 0)
 				throw new ArgumentOutOfRangeException(nameof(maximumNumberOfHistoricalMessagesToIncludeWithAnErrorEntry), "must be greater than zero");
-			if (!Enum.IsDefined(typeof(HistoryLoggingBehaviourOptions), historyLoggingBehaviour))
+			if ((historyLoggingBehaviour != HistoryLoggingBehaviourOptions.IncludeAllPrecedingMessages) && (historyLoggingBehaviour != HistoryLoggingBehaviourOptions.IncludePrecedingMessagesFromTheSameThreadOnly))
+			{
+				// Note: Explicitly check for all valid values rather than using Enum.IsDefined since IsDefined uses reflection and logging should be as cheap as possible
+				// (so reflection is best avoided)
 				throw new ArgumentOutOfRangeException(nameof(historyLoggingBehaviour));
-			if (!Enum.IsDefined(typeof(ErrorBehaviourOptions), individualLogEntryErrorBehaviour))
+			}
+			if ((individualLogEntryErrorBehaviour != ErrorBehaviourOptions.Ignore) && (individualLogEntryErrorBehaviour != ErrorBehaviourOptions.ThrowException))
+			{
+				// Note: Explicitly check for all valid values rather than using Enum.IsDefined since IsDefined uses reflection and logging should be as cheap as possible
+				// (so reflection is best avoided)
 				throw new ArgumentOutOfRangeException(nameof(individualLogEntryErrorBehaviour));
+			}
 
 			MaximumNumberOfHistoricalMessagesToMaintain = maximumNumberOfHistoricalMessagesToMaintain;
 			MaximumNumberOfHistoricalMessagesToIncludeWithAnErrorEntry = maximumNumberOfHistoricalMessagesToIncludeWithAnErrorEntry;
