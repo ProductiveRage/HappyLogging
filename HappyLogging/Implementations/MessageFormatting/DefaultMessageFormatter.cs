@@ -24,7 +24,7 @@ namespace HappyLogging.Implementations.MessageFormatting
 						message.LogLevel,
 						message.LogDate,
 						message.ManagedThreadId,
-						() => "Message log failure: " + e.Message,
+						"Message log failure: " + e.Message,
 						e
 					)
 				);
