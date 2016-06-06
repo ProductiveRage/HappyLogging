@@ -11,7 +11,7 @@ namespace HappyLogging.Implementations
 	/// on the Trace (the ErrorWithBackTrackLogger could be used to write these expensive messages - either to Trace or to a FileLogger -
 	/// only in cases where an Error is recorded, where the expensive Debug messages may aid with investigation).
 	/// </summary>
-	public class TraceLogger : TextLogger
+	public sealed class TraceLogger : TextLogger
 	{
 		public TraceLogger(Func<LogEventDetails, string> messageFormatter, ErrorBehaviourOptions individualLogEntryErrorBehaviour)
 			: base(messageFormatter, content => Trace.WriteLine(content), individualLogEntryErrorBehaviour) { }

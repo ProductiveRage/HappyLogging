@@ -8,7 +8,7 @@ namespace HappyLogging.Implementations
 	/// which means that multiple threads can read from, or write to, the streams" this leads to "Do not use the Console class to display output in
 	/// unattended applications, such as server applications")
 	/// </summary>
-	public class ConsoleLogger : TextLogger
+	public sealed class ConsoleLogger : TextLogger
 	{
 		public ConsoleLogger(Func<LogEventDetails, string> messageFormatter, ErrorBehaviourOptions individualLogEntryErrorBehaviour)
 			: base(messageFormatter, content => Console.WriteLine(content), individualLogEntryErrorBehaviour) { }

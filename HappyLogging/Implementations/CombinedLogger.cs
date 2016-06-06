@@ -7,7 +7,7 @@ namespace HappyLogging.Implementations
 	/// <summary>
 	/// Write log messages to multiple loggers
 	/// </summary>
-	public class CombinedLogger : ILogEvents
+	public sealed class CombinedLogger : ILogEvents
 	{
 		public CombinedLogger(IEnumerable<ILogEvents> loggers, ErrorBehaviourOptions individualLoggerErrorBehaviour)
 		{

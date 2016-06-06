@@ -7,7 +7,7 @@ namespace HappyLogging.Implementations
 	/// <summary>
 	/// Write log messages to trace, including additional content such as date, time and thread id
 	/// </summary>
-	public class FilteredLogger : ILogEvents
+	public sealed class FilteredLogger : ILogEvents
 	{
 		private readonly ILogEvents _logger;
 		public FilteredLogger(ILogEvents logger, IEnumerable<LogLevel> allowedLogLevels, ErrorBehaviourOptions individualLogEntryErrorBehaviour)

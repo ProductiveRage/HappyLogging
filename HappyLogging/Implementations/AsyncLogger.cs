@@ -7,7 +7,7 @@ namespace HappyLogging.Implementations
 	/// about having to wait for the log request to complete before being able to carry on with its work. It specifies a very short buffer duration and small queue size
 	/// so that messages are never delayed long and additional memory to hold the message queue never gets very large.
 	/// </summary>
-	public class AsyncLogger : ThrottlingLogger
+	public sealed class AsyncLogger : ThrottlingLogger
 	{
 		public AsyncLogger(ILogEvents logger)
 			: base(

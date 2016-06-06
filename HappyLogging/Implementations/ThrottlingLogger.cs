@@ -214,7 +214,7 @@ namespace HappyLogging.Implementations
 				_timer.Start();
 		}
 
-		private class PauseableTimer
+		private sealed class PauseableTimer
 		{
 			private readonly Timer _timer;
 			public PauseableTimer(TimeSpan frequency, Action callback)

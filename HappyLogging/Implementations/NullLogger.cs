@@ -8,7 +8,7 @@ namespace HappyLogging.Implementations
 	/// messages set, messages whose ContentGenerator delegates throw exception or IO exceptions where file-writing is attempted) will vary depending
 	/// upon the implementation
 	/// </summary>
-	public class NullLogger : ILogEvents
+	public sealed class NullLogger : ILogEvents
 	{
 		/// <summary>
 		/// This should throw an exception for a null message set but whether exceptions are thrown due to any other issues (eg. a message whose ContentGenerator

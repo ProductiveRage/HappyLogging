@@ -16,7 +16,7 @@ namespace HappyLogging.Implementations
 	/// Warning: This class is not thread-safe. In order to be used in a multi-threaded environment it must be wrapped in a ThrottlingLogger (or some other mechanism) to ensure
 	/// that it is never accessed by more than one thread at any time.
 	/// </summary>
-	public class ErrorWithBackTrackLogger : ILogEvents
+	public sealed class ErrorWithBackTrackLogger : ILogEvents
 	{
 		private readonly ILogEvents _logger;
 		private readonly Queue<LogEventDetails> _messages;

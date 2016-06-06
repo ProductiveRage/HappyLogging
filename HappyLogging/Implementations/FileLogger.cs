@@ -6,7 +6,7 @@ namespace HappyLogging.Implementations
 	/// <summary>
 	/// Append log messages to a file
 	/// </summary>
-	public class FileLogger : TextLogger
+	public sealed class FileLogger : TextLogger
 	{
 		public FileLogger(Func<FileInfo> fileRetriever, Func<LogEventDetails, string> messageFormatter, ErrorBehaviourOptions individualLogEntryErrorBehaviour)
 			: base(messageFormatter, GetOutputWriter(fileRetriever), individualLogEntryErrorBehaviour) { }
