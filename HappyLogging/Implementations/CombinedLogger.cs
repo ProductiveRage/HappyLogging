@@ -12,9 +12,9 @@ namespace HappyLogging.Implementations
 		public CombinedLogger(IEnumerable<ILogEvents> loggers, ErrorBehaviourOptions individualLoggerErrorBehaviour)
 		{
 			if (loggers == null)
-				throw new ArgumentNullException("loggers");
+				throw new ArgumentNullException(nameof(loggers));
 			if (!Enum.IsDefined(typeof(ErrorBehaviourOptions), individualLoggerErrorBehaviour))
-				throw new ArgumentOutOfRangeException("individualLoggerErrorBehaviour");
+				throw new ArgumentOutOfRangeException(nameof(individualLoggerErrorBehaviour));
 
 			Loggers = loggers.ToList().AsReadOnly();
 			if (Loggers.Any(logger => logger == null))
@@ -43,7 +43,7 @@ namespace HappyLogging.Implementations
 		public void Log(LogEventDetails message)
 		{
 			if (message == null)
-				throw new ArgumentNullException("message");
+				throw new ArgumentNullException(nameof(message));
 
 			foreach (var logger in Loggers)
 			{
@@ -67,7 +67,7 @@ namespace HappyLogging.Implementations
 		public void Log(IEnumerable<LogEventDetails> messages)
 		{
 			if (messages == null)
-				throw new ArgumentNullException("messages");
+				throw new ArgumentNullException(nameof(messages));
 
 			foreach (var logger in Loggers)
 			{

@@ -15,7 +15,7 @@ namespace HappyLogging.Implementations
 			: this(() => file, messageFormatter, individualLogEntryErrorBehaviour)
 		{
 			if (file == null)
-				throw new ArgumentNullException("file");
+				throw new ArgumentNullException(nameof(file));
 		}
 		
 		public FileLogger(Func<FileInfo> fileRetriever) : this(fileRetriever, Defaults.MessageFormatter, Defaults.IndividualLogEntryErrorBehaviour) { }
@@ -25,7 +25,7 @@ namespace HappyLogging.Implementations
 		private static Action<string> GetOutputWriter(Func<FileInfo> fileRetriever)
 		{
 			if (fileRetriever == null)
-				throw new ArgumentNullException("fileRetriever");
+				throw new ArgumentNullException(nameof(fileRetriever));
 
 			return content =>
 			{

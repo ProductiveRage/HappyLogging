@@ -18,7 +18,7 @@ namespace HappyLogging.Factories
 		public static ILogEvents DailyLogger(FileInfo fileBase)
 		{
 			if (fileBase == null)
-				throw new ArgumentNullException("fileBase");
+				throw new ArgumentNullException(nameof(fileBase));
 
 			return CombineWithTraceLogger(
 				DailyLogger(fileBase, null, LogLevelFilteringOptions.IncludeAllMessages)
@@ -33,9 +33,9 @@ namespace HappyLogging.Factories
 		public static ILogEvents DailyLogger(FileInfo fileBase, int targetMaximumFileSizeInBytes)
 		{
 			if (fileBase == null)
-				throw new ArgumentNullException("fileBase");
+				throw new ArgumentNullException(nameof(fileBase));
 			if (targetMaximumFileSizeInBytes <= 0)
-				throw new ArgumentOutOfRangeException("targetMaximumFileSizeInBytes");
+				throw new ArgumentOutOfRangeException(nameof(targetMaximumFileSizeInBytes));
 
 			return CombineWithTraceLogger(
 				DailyLogger(fileBase, targetMaximumFileSizeInBytes, LogLevelFilteringOptions.IncludeAllMessages)
@@ -52,7 +52,7 @@ namespace HappyLogging.Factories
 		public static ILogEvents DailyErrorLogger(FileInfo fileBase)
 		{
 			if (fileBase == null)
-				throw new ArgumentNullException("fileBase");
+				throw new ArgumentNullException(nameof(fileBase));
 
 			return CombineWithTraceLogger(
 				DailyLogger(fileBase, null, LogLevelFilteringOptions.ErrorOnly)
@@ -62,11 +62,11 @@ namespace HappyLogging.Factories
 		private static ILogEvents DailyLogger(FileInfo fileBase, int? targetMaximumFileSizeInBytes, LogLevelFilteringOptions logLevelFilteringOptions)
 		{
 			if (fileBase == null)
-				throw new ArgumentNullException("fileBase");
+				throw new ArgumentNullException(nameof(fileBase));
 			if ((targetMaximumFileSizeInBytes != null) && (targetMaximumFileSizeInBytes.Value <= 0))
-				throw new ArgumentOutOfRangeException("targetMaximumFileSizeInBytes");
+				throw new ArgumentOutOfRangeException(nameof(targetMaximumFileSizeInBytes));
 			if ((logLevelFilteringOptions != LogLevelFilteringOptions.ErrorOnly) && (logLevelFilteringOptions != LogLevelFilteringOptions.IncludeAllMessages))
-				throw new ArgumentOutOfRangeException("logLevelFilteringOptions");
+				throw new ArgumentOutOfRangeException(logLevelFilteringOptions));
 
 			var extension = fileBase.Extension; // Note: This will include the dot (eg. ".txt")
 			var filenameWithoutExtension = fileBase.FullName.Substring(0, fileBase.FullName.Length - extension.Length);
@@ -120,7 +120,7 @@ namespace HappyLogging.Factories
 		private static ILogEvents CombineWithTraceLogger(ILogEvents logger)
 		{
 			if (logger == null)
-				throw new ArgumentNullException("logger");
+				throw new ArgumentNullException(nameof(logger));
 
 			// Note: Here an AsyncLogger is used just so that the log writer needn't worry about waiting for any trace listeners to deal with the
 			// messages being broadcast, they can just carry on with their real work and the listeners will get the data on a separate thread

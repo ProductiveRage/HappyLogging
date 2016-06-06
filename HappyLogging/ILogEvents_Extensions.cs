@@ -8,7 +8,7 @@ namespace HappyLogging
 		public static void Log(this ILogEvents logger, LogLevel logLevel, DateTime logDate, int managedThreadId, Func<string> contentGenerator, Exception exception)
 		{
 			if (logger == null)
-				throw new ArgumentNullException("logger");
+				throw new ArgumentNullException(nameof(logger));
 
 			logger.Log(new LogEventDetails(logLevel, logDate, managedThreadId, contentGenerator, exception));
 		}
@@ -20,7 +20,7 @@ namespace HappyLogging
 		public static void LogIgnoringAnyError(this ILogEvents logger, LogLevel logLevel, DateTime logDate, int managedThreadId, Func<string> contentGenerator, Exception exception)
 		{
 			if (logger == null)
-				throw new ArgumentNullException("logger");
+				throw new ArgumentNullException(nameof(logger));
 
 			try
 			{
@@ -36,7 +36,7 @@ namespace HappyLogging
 		public static void LogIgnoringAnyError(this ILogEvents logger, LogLevel logLevel, Func<string> contentGenerator, Exception exception = null)
 		{
 			if (logger == null)
-				throw new ArgumentNullException("logger");
+				throw new ArgumentNullException(nameof(logger));
 
 			try
 			{
@@ -48,7 +48,7 @@ namespace HappyLogging
 		public static void Log(this ILogEvents logger, LogLevel logLevel, DateTime logDate, int managedThreadId, string content, Exception exception)
 		{
 			if (logger == null)
-				throw new ArgumentNullException("logger");
+				throw new ArgumentNullException(nameof(logger));
 
 			logger.Log(new LogEventDetails(logLevel, logDate, managedThreadId, content, exception));
 		}
@@ -60,7 +60,7 @@ namespace HappyLogging
 		public static void LogIgnoringAnyError(this ILogEvents logger, LogLevel logLevel, DateTime logDate, int managedThreadId, string content, Exception exception)
 		{
 			if (logger == null)
-				throw new ArgumentNullException("logger");
+				throw new ArgumentNullException(nameof(logger));
 
 			try
 			{
@@ -76,7 +76,7 @@ namespace HappyLogging
 		public static void LogIgnoringAnyError(this ILogEvents logger, LogLevel logLevel, string content, Exception exception = null)
 		{
 			if (logger == null)
-				throw new ArgumentNullException("logger");
+				throw new ArgumentNullException(nameof(logger));
 
 			try
 			{
@@ -92,7 +92,7 @@ namespace HappyLogging
 		public static void LogIgnoringAnyError(this ILogEvents logger, Exception error)
 		{
 			if (logger == null)
-				throw new ArgumentNullException("logger");
+				throw new ArgumentNullException(nameof(logger));
 
 			// If there's no error then there's nothing to log, but this method is not supposed to throw an error when operating against a logger
 			// implementation (which is why the ArgumentNullException above is acceptable) so if error is null then do nothing

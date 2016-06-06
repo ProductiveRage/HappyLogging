@@ -17,7 +17,7 @@ namespace HappyLogging.Implementations
 		public void Log(LogEventDetails message)
 		{
 			if (message == null)
-				throw new ArgumentNullException("message");
+				throw new ArgumentNullException(nameof(message));
 		}
 
 		/// <summary>
@@ -28,7 +28,7 @@ namespace HappyLogging.Implementations
 		public void Log(IEnumerable<LogEventDetails> messages)
 		{
 			if (messages == null)
-				throw new ArgumentNullException("messages");
+				throw new ArgumentNullException(nameof(messages));
 		}
 	}
 }

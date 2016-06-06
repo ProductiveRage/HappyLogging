@@ -27,15 +27,15 @@ namespace HappyLogging.Implementations
 			ErrorBehaviourOptions individualLogEntryErrorBehaviour)
 		{
 			if (logger == null)
-				throw new ArgumentNullException("logger");
+				throw new ArgumentNullException(nameof(logger));
 			if (mimimumFrequency.Ticks <= 0)
-				throw new ArgumentOutOfRangeException("mimimumFrequency", "must be a positive duration");
+				throw new ArgumentOutOfRangeException(nameof(mimimumFrequency), "must be a positive duration");
 			if (maximumNumberOfBufferedItems <= 0)
-				throw new ArgumentOutOfRangeException("maximumNumberOfBufferedItems", "must be a positive value");
+				throw new ArgumentOutOfRangeException(nameof(maximumNumberOfBufferedItems), "must be a positive value");
 			if (!Enum.IsDefined(typeof(MessageEvaluationBehaviourOptions), messageEvaluationBehaviour))
-				throw new ArgumentOutOfRangeException("messageEvaluationBehaviour");
+				throw new ArgumentOutOfRangeException(nameof(messageEvaluationBehaviour));
 			if (!Enum.IsDefined(typeof(ErrorBehaviourOptions), individualLogEntryErrorBehaviour))
-				throw new ArgumentOutOfRangeException("individualLogEntryErrorBehaviour");
+				throw new ArgumentOutOfRangeException(nameof(individualLogEntryErrorBehaviour));
 
 			MaximumNumberOfBufferedItems = maximumNumberOfBufferedItems;
 			MinimumFrequency = mimimumFrequency;
@@ -139,7 +139,7 @@ namespace HappyLogging.Implementations
 		public void Log(LogEventDetails message)
 		{
 			if (message == null)
-				throw new ArgumentNullException("message");
+				throw new ArgumentNullException(nameof(message));
 
 			QueueMessage(message);
 			FlushQueueIfNecessary();
@@ -152,7 +152,7 @@ namespace HappyLogging.Implementations
 		public void Log(IEnumerable<LogEventDetails> messages)
 		{
 			if (messages == null)
-				throw new ArgumentNullException("message");
+				throw new ArgumentNullException(nameof(message));
 
 			foreach (var message in messages)
 			{
@@ -220,9 +220,9 @@ namespace HappyLogging.Implementations
 			public PauseableTimer(TimeSpan frequency, Action callback)
 			{
 				if (frequency.Ticks <= 0)
-					throw new ArgumentOutOfRangeException("mimimumFrequency", "must be a positive duration");
+					throw new ArgumentOutOfRangeException(nameof(mimimumFrequency), "must be a positive duration");
 				if (callback == null)
-					throw new ArgumentNullException("callback");
+					throw new ArgumentNullException(nameof(callback));
 
 				Frequency = frequency;
 				_timer = new Timer(

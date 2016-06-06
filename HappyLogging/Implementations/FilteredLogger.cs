@@ -13,9 +13,9 @@ namespace HappyLogging.Implementations
 		public FilteredLogger(ILogEvents logger, IEnumerable<LogLevel> allowedLogLevels, ErrorBehaviourOptions individualLogEntryErrorBehaviour)
 		{
 			if (logger == null)
-				throw new ArgumentNullException("logger");
+				throw new ArgumentNullException(nameof(logger));
 			if (allowedLogLevels == null)
-				throw new ArgumentNullException("allowedLogLevels");
+				throw new ArgumentNullException(nameof(allowedLogLevels));
 			if (!Enum.IsDefined(typeof(ErrorBehaviourOptions), individualLogEntryErrorBehaviour))
 				throw new ArgumentOutOfRangeException("individualLogEntryErrorBehaviour");
 
@@ -45,7 +45,7 @@ namespace HappyLogging.Implementations
 		public void Log(LogEventDetails message)
 		{
 			if (message == null)
-				throw new ArgumentNullException("messages");
+				throw new ArgumentNullException(nameof(messages));
 
 			if (!AllowedLogLevels.Contains(message.LogLevel))
 				return;
@@ -61,7 +61,7 @@ namespace HappyLogging.Implementations
 		public void Log(IEnumerable<LogEventDetails> messages)
 		{
 			if (messages == null)
-				throw new ArgumentNullException("messages");
+				throw new ArgumentNullException(nameof(messages));
 
 			_logger.Log(messages.Where(message =>
 			{

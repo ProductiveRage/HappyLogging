@@ -28,15 +28,15 @@ namespace HappyLogging.Implementations
 			ErrorBehaviourOptions individualLogEntryErrorBehaviour)
 		{
 			if (logger == null)
-				throw new ArgumentNullException("logger");
+				throw new ArgumentNullException(nameof(logger));
 			if (maximumNumberOfHistoricalMessagesToMaintain <= 0)
-				throw new ArgumentOutOfRangeException("maximumNumberOfHistoricalMessagesToMaintain", "must be greater than zero");
+				throw new ArgumentOutOfRangeException(nameof(maximumNumberOfHistoricalMessagesToMaintain), "must be greater than zero");
 			if (maximumNumberOfHistoricalMessagesToIncludeWithAnErrorEntry <= 0)
-				throw new ArgumentOutOfRangeException("maximumNumberOfHistoricalMessagesToIncludeWithAnErrorEntry", "must be greater than zero");
+				throw new ArgumentOutOfRangeException(nameof(maximumNumberOfHistoricalMessagesToIncludeWithAnErrorEntry), "must be greater than zero");
 			if (!Enum.IsDefined(typeof(HistoryLoggingBehaviourOptions), historyLoggingBehaviour))
-				throw new ArgumentOutOfRangeException("historyLoggingBehaviour");
+				throw new ArgumentOutOfRangeException(nameof(historyLoggingBehaviour));
 			if (!Enum.IsDefined(typeof(ErrorBehaviourOptions), individualLogEntryErrorBehaviour))
-				throw new ArgumentOutOfRangeException("individualLogEntryErrorBehaviour");
+				throw new ArgumentOutOfRangeException(nameof(individualLogEntryErrorBehaviour));
 
 			MaximumNumberOfHistoricalMessagesToMaintain = maximumNumberOfHistoricalMessagesToMaintain;
 			MaximumNumberOfHistoricalMessagesToIncludeWithAnErrorEntry = maximumNumberOfHistoricalMessagesToIncludeWithAnErrorEntry;
@@ -90,7 +90,7 @@ namespace HappyLogging.Implementations
 		public void Log(LogEventDetails message)
 		{
 			if (message == null)
-				throw new ArgumentNullException("message");
+				throw new ArgumentNullException(nameof(message));
 
 			var messagesToLogImmediatelyIfAny = QueueMessageAndReturnAnyMessagesThatShouldBeLoggedImmediately(message);
 			if ((messagesToLogImmediatelyIfAny != null) && (messagesToLogImmediatelyIfAny.Count > 0))
@@ -105,7 +105,7 @@ namespace HappyLogging.Implementations
 		public void Log(IEnumerable<LogEventDetails> messages)
 		{
 			if (messages == null)
-				throw new ArgumentNullException("messages");
+				throw new ArgumentNullException(nameof(messages));
 
 			var messagesToPassThrough = new List<LogEventDetails>();
 			foreach (var message in messages)

@@ -11,7 +11,7 @@ namespace HappyLogging.Implementations.MessageFormatting
 		public static string Format(LogEventDetails message)
 		{
 			if (message == null)
-				throw new ArgumentNullException("message");
+				throw new ArgumentNullException(nameof(message));
 
 			try
 			{
@@ -34,7 +34,7 @@ namespace HappyLogging.Implementations.MessageFormatting
 		private static string FormatMessage(LogEventDetails message)
 		{
 			if (message == null)
-				throw new ArgumentNullException("message");
+				throw new ArgumentNullException(nameof(message));
 
 			var detailedContent = new StringBuilder();
 			detailedContent.AppendFormat("[{0}] [Thread{1}] ", message.LogDate.ToString("yyyy-MM-dd HH:mm:ss.fff"), message.ManagedThreadId);

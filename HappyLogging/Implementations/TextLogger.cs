@@ -14,11 +14,11 @@ namespace HappyLogging.Implementations
 		protected TextLogger(Func<LogEventDetails, string> messageFormatter, Action<string> outputWriter, ErrorBehaviourOptions individualLogEntryErrorBehaviour)
 		{
 			if (messageFormatter == null)
-				throw new ArgumentNullException("messageFormatter");
+				throw new ArgumentNullException(nameof(messageFormatter));
 			if (outputWriter == null)
-				throw new ArgumentNullException("outputWriter");
+				throw new ArgumentNullException(nameof(outputWriter));
 			if (!Enum.IsDefined(typeof(ErrorBehaviourOptions), individualLogEntryErrorBehaviour))
-				throw new ArgumentOutOfRangeException("individualLogEntryErrorBehaviour");
+				throw new ArgumentOutOfRangeException(nameof(individualLogEntryErrorBehaviour));
 
 			IndividualLogEntryErrorBehaviour = individualLogEntryErrorBehaviour;
 			_messageFormatter = messageFormatter;
@@ -40,7 +40,7 @@ namespace HappyLogging.Implementations
 		public void Log(LogEventDetails message)
 		{
 			if (message == null)
-				throw new ArgumentNullException("message");
+				throw new ArgumentNullException(nameof(message));
 
 			var combinedContentBuilder = new StringBuilder();
 			string messageContentToDisplay;
@@ -69,7 +69,7 @@ namespace HappyLogging.Implementations
 		public void Log(IEnumerable<LogEventDetails> messages)
 		{
 			if (messages == null)
-				throw new ArgumentNullException("messages");
+				throw new ArgumentNullException(nameof(messages));
 
 			var combinedContentBuilder = new StringBuilder();
 			var isFirstMessage = true;
