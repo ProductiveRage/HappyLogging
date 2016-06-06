@@ -3,7 +3,7 @@ using System.Text;
 
 namespace HappyLogging
 {
-	public static class DefaultMessageFormatter
+	internal static class DefaultMessageFormatter
 	{
 		/// <summary>
 		/// This will throw an exception for a null message argument or if the message's ContentGenerator delegate raises an exception
