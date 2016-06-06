@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace HappyLogging.Implementations
+namespace HappyLogging
 {
 	/// <summary>
 	/// Write log messages to the Console - this can be useful in quickly getting some output for testing but there are performance reasons to avoid this

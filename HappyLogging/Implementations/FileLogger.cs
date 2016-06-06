@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace HappyLogging.Implementations
+namespace HappyLogging
 {
 	/// <summary>
 	/// Append log messages to a file

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 
-namespace HappyLogging.Implementations
+namespace HappyLogging
 {
 	/// <summary>
 	/// Write log messages to Trace - this may be useful in production as configuration of the Trace symbol and of Trace Listeners can make the cost

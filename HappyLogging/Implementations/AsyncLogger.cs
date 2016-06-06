@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace HappyLogging.Implementations
+namespace HappyLogging
 {
 	/// <summary>
 	/// This is just a convenience class that backs onto the ThrottlingLogger. It allows for log requests to be made asynchronously so that the caller never need worry

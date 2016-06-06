@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace HappyLogging.Implementations.MessageFormatting
+namespace HappyLogging
 {
 	public static class DefaultMessageFormatter
 	{

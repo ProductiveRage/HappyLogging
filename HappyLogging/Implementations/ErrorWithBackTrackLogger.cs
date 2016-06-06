@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace HappyLogging.Implementations
+namespace HappyLogging
 {
 	/// <summary>
 	/// This will not pass most non-Error messages to the wrapped logger, but when an Error message is encountered then the most recent log messages for all levels will be

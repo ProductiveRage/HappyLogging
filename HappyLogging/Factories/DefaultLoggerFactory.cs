@@ -1,8 +1,7 @@
 ﻿using System;
 using System.IO;
-using HappyLogging.Implementations;
 
-namespace HappyLogging.Factories
+namespace HappyLogging
 {
 	/// <summary>
 	/// These loggers demonstrate some of the functionality of the library. They buffer up messages before writing to disk but send them to the Trace in

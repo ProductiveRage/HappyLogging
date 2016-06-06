@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 
-namespace HappyLogging.Implementations
+namespace HappyLogging
 {
 	/// <summary>
 	/// This will batch up log requests and dispatch them in groups, reducing the number of calls overall to the wrapped logger. This can be advantageous if the wrapped

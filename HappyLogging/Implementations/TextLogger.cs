@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace HappyLogging.Implementations
+namespace HappyLogging
 {
 	/// <summary>
 	/// Write log messages to the Console
@@ -31,7 +31,7 @@ namespace HappyLogging.Implementations
 
 		public static class Defaults
 		{
-			public static Func<LogEventDetails, string> MessageFormatter { get { return MessageFormatting.DefaultMessageFormatter.Format; } }
+			public static Func<LogEventDetails, string> MessageFormatter { get { return DefaultMessageFormatter.Format; } }
 			public static ErrorBehaviourOptions IndividualLogEntryErrorBehaviour { get { return ErrorBehaviourOptions.Ignore; } }
 		}
 
