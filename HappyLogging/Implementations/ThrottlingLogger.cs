@@ -133,7 +133,21 @@ namespace HappyLogging.Implementations
 		}
 
 		/// <summary>
-		/// This will throw an exception if issues are encountered - this includes cases of a null messages set or one containing any null references
+		/// This should throw an exception for a null message set but whether exceptions are thrown due to any other issues (eg. a message whose ContentGenerator
+		/// delegate throws an exception or IO exceptions where file-writing is attempted) will vary depending upon the implementation
+		/// </summary>
+		public void Log(LogEventDetails message)
+		{
+			if (message == null)
+				throw new ArgumentNullException("message");
+
+			QueueMessage(message);
+			FlushQueueIfNecessary();
+		}
+
+		/// <summary>
+		/// This should throw an exception for a null message set but whether exceptions are thrown due to any other issues (eg. a message whose ContentGenerator
+		/// delegate throws an exception or IO exceptions where file-writing is attempted) will vary depending upon the implementation
 		/// </summary>
 		public void Log(IEnumerable<LogEventDetails> messages)
 		{
@@ -144,47 +158,54 @@ namespace HappyLogging.Implementations
 			{
 				if ((message == null) && (IndividualLogEntryErrorBehaviour == ErrorBehaviourOptions.ThrowException))
 					throw new ArgumentException("Null reference encountered in messages set");
-
-				// If the message is to be evaluated when it's actually logged (which may be in the future), as opposed to when it's queued (which is right now)
-				// the push it straight onto the queue. Or, if the content is a string and not a lazily-evaluating Func then we can also queue it immediately.
-				if ((MessageEvaluationBehaviour == MessageEvaluationBehaviourOptions.EvaluateWhenLogged) || (message.ContentGenerator == null))
-				{
-					_messages.Enqueue(message);
-					continue;
-				}
-
-				// If the message is to be evaluated when queued (ie. right now) then we need to evaulate the ContentGenerator. This will be desirable if there
-				// is any content that is time dependent (eg. "time to complete = {x}ms") or in cases where there are any references that are required by the
-				// message evaluation that might be disposed of between now and when the message is recorded. Note: Just because the message content is being
-				// evaluated immediately doesn't negate the benefit of a content generator delegate, there could be relative-expensive-to-log messages that
-				// should only be written away in debug mode, which case a FilteredLogger might wrap a ThrottlingLogger instance so that the messages are only
-				// evaluated if Debug-level messages are allowed through the filter.
-				string messageContents;
-				if (message.Content != null)
-					messageContents = message.Content;
-				else
-				{
-					try
-					{
-						messageContents = message.ContentGenerator();
-					}
-					catch
-					{
-						if (IndividualLogEntryErrorBehaviour == ErrorBehaviourOptions.ThrowException)
-							throw;
-						continue;
-					}
-				}
-				_messages.Enqueue(
-					new LogEventDetails(
-						message.LogLevel,
-						message.LogDate,
-						message.ManagedThreadId,
-						() => messageContents,
-						message.OptionalException
-					)
-				);
+				QueueMessage(message);
 			}
+			FlushQueueIfNecessary();
+		}
+
+		private void QueueMessage(LogEventDetails message)
+		{
+			if (message == null)
+				throw new ArgumentNullException(nameof(message));
+
+			// If the message is to be evaluated when it's actually logged (which may be in the future), as opposed to when it's queued (which is right now)
+			// the push it straight onto the queue. Or, if the content is a string and not a lazily-evaluating Func then we can also queue it immediately.
+			if ((MessageEvaluationBehaviour == MessageEvaluationBehaviourOptions.EvaluateWhenLogged) || (message.ContentGenerator == null))
+			{
+				_messages.Enqueue(message);
+				return;
+			}
+
+			// If the message is to be evaluated when queued (ie. right now) then we need to evaulate the ContentGenerator. This will be desirable if there
+			// is any content that is time dependent (eg. "time to complete = {x}ms") or in cases where there are any references that are required by the
+			// message evaluation that might be disposed of between now and when the message is recorded. Note: Just because the message content is being
+			// evaluated immediately doesn't negate the benefit of a content generator delegate, there could be relative-expensive-to-log messages that
+			// should only be written away in debug mode, which case a FilteredLogger might wrap a ThrottlingLogger instance so that the messages are only
+			// evaluated if Debug-level messages are allowed through the filter.
+			string messageContents;
+			try
+			{
+				messageContents = message.ContentGenerator(); // We know that ContentGenerator is non-null (we checked for a null reference above)
+			}
+			catch
+			{
+				if (IndividualLogEntryErrorBehaviour == ErrorBehaviourOptions.ThrowException)
+					throw;
+				return;
+			}
+			_messages.Enqueue(
+				new LogEventDetails(
+					message.LogLevel,
+					message.LogDate,
+					message.ManagedThreadId,
+					messageContents,
+					message.OptionalException
+				)
+			);
+		}
+
+		private void FlushQueueIfNecessary()
+		{
 			if (_messages.Count > MaximumNumberOfBufferedItems)
 				FlushQueueIfNotAlreadyDoingSo();
 			else if ((_lastFlushedAt != null) && (DateTime.Now > _lastFlushedAt.Value.Add(_timer.Frequency)))

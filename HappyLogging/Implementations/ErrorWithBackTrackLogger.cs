@@ -84,6 +84,20 @@ namespace HappyLogging.Implementations
 		public ErrorBehaviourOptions IndividualLogEntryErrorBehaviour { get; }
 
 		/// <summary>
+		/// This should throw an exception for a null message set but whether exceptions are thrown due to any other issues (eg. a message whose ContentGenerator
+		/// delegate throws an exception or IO exceptions where file-writing is attempted) will vary depending upon the implementation
+		/// </summary>
+		public void Log(LogEventDetails message)
+		{
+			if (message == null)
+				throw new ArgumentNullException("message");
+
+			var messagesToLogImmediatelyIfAny = QueueMessageAndReturnAnyMessagesThatShouldBeLoggedImmediately(message);
+			if ((messagesToLogImmediatelyIfAny != null) && (messagesToLogImmediatelyIfAny.Count > 0))
+				_logger.Log(messagesToLogImmediatelyIfAny);
+		}
+
+		/// <summary>
 		/// This should throw an exception for a null messages set but whether exceptions are thrown due to any other issues (eg. null references within the
 		/// messages set, messages whose ContentGenerator delegates throw exception or IO exceptions where file-writing is attempted) will vary depending
 		/// upon the implementation
@@ -99,44 +113,53 @@ namespace HappyLogging.Implementations
 				if ((message == null) && (IndividualLogEntryErrorBehaviour == ErrorBehaviourOptions.ThrowException))
 					throw new ArgumentException("Null reference encountered in messages set");
 
-				if (message.LogLevel == LogLevel.Error)
-				{
-					var historicalMessagesToIncludeWithError = HistoryLoggingBehaviour == HistoryLoggingBehaviourOptions.IncludeAllPrecedingMessages
-						? (IEnumerable<LogEventDetails>)_messages
-						:_messages.Where(m => m.ManagedThreadId == message.ManagedThreadId);
-					if (historicalMessagesToIncludeWithError.Any())
-					{
-						var historicalMessagesToIncludeWithErrorArray = historicalMessagesToIncludeWithError.ToArray();
-						if (historicalMessagesToIncludeWithErrorArray.Length > MaximumNumberOfHistoricalMessagesToMaintain)
-						{
-							messagesToPassThrough.AddRange(
-								historicalMessagesToIncludeWithErrorArray.Skip(
-									MaximumNumberOfHistoricalMessagesToIncludeWithAnErrorEntry - historicalMessagesToIncludeWithErrorArray.Length
-								)
-							);
-						}
-						else
-							messagesToPassThrough.AddRange(historicalMessagesToIncludeWithErrorArray);
+				var messagesToLogImmediatelyIfAny = QueueMessageAndReturnAnyMessagesThatShouldBeLoggedImmediately(message);
+				if (messagesToLogImmediatelyIfAny != null)
+					messagesToPassThrough.AddRange(messagesToLogImmediatelyIfAny);
+			}
+			if (messagesToPassThrough.Count > 0)
+				_logger.Log(messagesToPassThrough);
+		}
 
-						var historicalMessagesLookup = new HashSet<LogEventDetails>(historicalMessagesToIncludeWithError);
-						var messagesToKeep = _messages.Where(m => !historicalMessagesLookup.Contains(m)).ToArray();
-						_messages.Clear();
-						foreach (var messageToKeep in messagesToKeep)
-							_messages.Enqueue(messageToKeep);
-					}
-					
-					messagesToPassThrough.Add(message);
-				}
-				else
-				{
-					_messages.Enqueue(message);
-					while (_messages.Count >= MaximumNumberOfHistoricalMessagesToMaintain)
-						_messages.Dequeue();
-				}
+		private List<LogEventDetails> QueueMessageAndReturnAnyMessagesThatShouldBeLoggedImmediately(LogEventDetails message)
+		{
+			if (message == null)
+				throw new ArgumentNullException(nameof(message));
+
+			if (message.LogLevel != LogLevel.Error)
+			{
+				_messages.Enqueue(message);
+				while (_messages.Count >= MaximumNumberOfHistoricalMessagesToMaintain)
+					_messages.Dequeue();
+				return null;
 			}
 
-			if (messagesToPassThrough.Any())
-				_logger.Log(messagesToPassThrough);
+			var historicalMessagesToIncludeWithError = HistoryLoggingBehaviour == HistoryLoggingBehaviourOptions.IncludeAllPrecedingMessages
+				? (IEnumerable<LogEventDetails>)_messages
+				: _messages.Where(m => m.ManagedThreadId == message.ManagedThreadId);
+			var messagesToPassThrough = new List<LogEventDetails>();
+			if (historicalMessagesToIncludeWithError.Any())
+			{
+				var historicalMessagesToIncludeWithErrorArray = historicalMessagesToIncludeWithError.ToArray();
+				if (historicalMessagesToIncludeWithErrorArray.Length > MaximumNumberOfHistoricalMessagesToMaintain)
+				{
+					messagesToPassThrough.AddRange(
+						historicalMessagesToIncludeWithErrorArray.Skip(
+							MaximumNumberOfHistoricalMessagesToIncludeWithAnErrorEntry - historicalMessagesToIncludeWithErrorArray.Length
+						)
+					);
+				}
+				else
+					messagesToPassThrough.AddRange(historicalMessagesToIncludeWithErrorArray);
+
+				var historicalMessagesLookup = new HashSet<LogEventDetails>(historicalMessagesToIncludeWithError);
+				var messagesToKeep = _messages.Where(m => !historicalMessagesLookup.Contains(m)).ToArray();
+				_messages.Clear();
+				foreach (var messageToKeep in messagesToKeep)
+					_messages.Enqueue(messageToKeep);
+			}
+			messagesToPassThrough.Add(message);
+			return messagesToPassThrough;
 		}
 	}
 }

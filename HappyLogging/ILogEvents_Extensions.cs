@@ -10,7 +10,7 @@ namespace HappyLogging
 			if (logger == null)
 				throw new ArgumentNullException("logger");
 
-			logger.Log(new[] { new LogEventDetails(logLevel, logDate, managedThreadId, contentGenerator, exception) });
+			logger.Log(new LogEventDetails(logLevel, logDate, managedThreadId, contentGenerator, exception));
 		}
 
 		/// <summary>
@@ -24,7 +24,7 @@ namespace HappyLogging
 
 			try
 			{
-				Log(logger, logLevel, logDate, managedThreadId, contentGenerator, exception);
+				logger.Log(new LogEventDetails(logLevel, logDate, managedThreadId, contentGenerator, exception));
 			}
 			catch { }
 		}
@@ -40,7 +40,7 @@ namespace HappyLogging
 
 			try
 			{
-				Log(logger, logLevel, DateTime.Now, Thread.CurrentThread.ManagedThreadId, contentGenerator, exception);
+				logger.Log(new LogEventDetails(logLevel, DateTime.Now, Thread.CurrentThread.ManagedThreadId, contentGenerator, exception));
 			}
 			catch { }
 		}
@@ -50,7 +50,7 @@ namespace HappyLogging
 			if (logger == null)
 				throw new ArgumentNullException("logger");
 
-			logger.Log(new[] { new LogEventDetails(logLevel, logDate, managedThreadId, content, exception) });
+			logger.Log(new LogEventDetails(logLevel, logDate, managedThreadId, content, exception));
 		}
 
 		/// <summary>
@@ -64,7 +64,7 @@ namespace HappyLogging
 
 			try
 			{
-				Log(logger, logLevel, logDate, managedThreadId, content, exception);
+				logger.Log(new LogEventDetails(logLevel, logDate, managedThreadId, content, exception));
 			}
 			catch { }
 		}
@@ -80,7 +80,7 @@ namespace HappyLogging
 
 			try
 			{
-				Log(logger, logLevel, DateTime.Now, Thread.CurrentThread.ManagedThreadId, content, exception);
+				logger.Log(new LogEventDetails(logLevel, DateTime.Now, Thread.CurrentThread.ManagedThreadId, content, exception));
 			}
 			catch { }
 		}
@@ -101,7 +101,7 @@ namespace HappyLogging
 
 			try
 			{
-				Log(logger, LogLevel.Error, DateTime.Now, Thread.CurrentThread.ManagedThreadId, "", error);
+				logger.Log(new LogEventDetails(LogLevel.Error, DateTime.Now, Thread.CurrentThread.ManagedThreadId, "", error));
 			}
 			catch { }
 		}
