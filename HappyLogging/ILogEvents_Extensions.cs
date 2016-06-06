@@ -38,7 +38,11 @@ namespace HappyLogging
 			if (logger == null)
 				throw new ArgumentNullException("logger");
 
-			LogIgnoringAnyError(logger, logLevel, DateTime.Now, Thread.CurrentThread.ManagedThreadId, contentGenerator, exception);
+			try
+			{
+				Log(logger, logLevel, DateTime.Now, Thread.CurrentThread.ManagedThreadId, contentGenerator, exception);
+			}
+			catch { }
 		}
 
 		public static void Log(this ILogEvents logger, LogLevel logLevel, DateTime logDate, int managedThreadId, string content, Exception exception)
@@ -74,7 +78,11 @@ namespace HappyLogging
 			if (logger == null)
 				throw new ArgumentNullException("logger");
 
-			LogIgnoringAnyError(logger, logLevel, DateTime.Now, Thread.CurrentThread.ManagedThreadId, content, exception);
+			try
+			{
+				Log(logger, logLevel, DateTime.Now, Thread.CurrentThread.ManagedThreadId, content, exception);
+			}
+			catch { }
 		}
 
 		/// <summary>
@@ -91,7 +99,11 @@ namespace HappyLogging
 			if (error == null)
 				return;
 
-			LogIgnoringAnyError(logger, LogLevel.Error, "", error);
+			try
+			{
+				Log(logger, LogLevel.Error, DateTime.Now, Thread.CurrentThread.ManagedThreadId, "", error);
+			}
+			catch { }
 		}
 	}
 }
