@@ -36,6 +36,7 @@ namespace HappyLogging.Implementations
 				throw new ArgumentOutOfRangeException(nameof(messageEvaluationBehaviour));
 			if (!Enum.IsDefined(typeof(ErrorBehaviourOptions), individualLogEntryErrorBehaviour))
 				throw new ArgumentOutOfRangeException(nameof(individualLogEntryErrorBehaviour));
+			}
 
 			MaximumNumberOfBufferedItems = maximumNumberOfBufferedItems;
 			MinimumFrequency = mimimumFrequency;
@@ -152,7 +153,7 @@ namespace HappyLogging.Implementations
 		public void Log(IEnumerable<LogEventDetails> messages)
 		{
 			if (messages == null)
-				throw new ArgumentNullException(nameof(message));
+				throw new ArgumentNullException(nameof(messages));
 
 			foreach (var message in messages)
 			{
@@ -220,7 +221,7 @@ namespace HappyLogging.Implementations
 			public PauseableTimer(TimeSpan frequency, Action callback)
 			{
 				if (frequency.Ticks <= 0)
-					throw new ArgumentOutOfRangeException(nameof(mimimumFrequency), "must be a positive duration");
+					throw new ArgumentOutOfRangeException(nameof(frequency), "must be a positive duration");
 				if (callback == null)
 					throw new ArgumentNullException(nameof(callback));
 

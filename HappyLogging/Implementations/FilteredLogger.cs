@@ -24,8 +24,8 @@ namespace HappyLogging.Implementations
 			_logger = logger;
 			AllowedLogLevels = allowedLogLevels.ToList().AsReadOnly();
 			if (AllowedLogLevels.Any(l => !Enum.IsDefined(typeof(LogLevel), l)))
-				throw new ArgumentException("Invalid LogLevel value specified");
-		}
+					throw new ArgumentException("Invalid LogLevel value specified");
+			}
 		public FilteredLogger(ILogEvents logger, IEnumerable<LogLevel> allowedLogLevels) : this(logger, allowedLogLevels, Defaults.IndividualLogEntryErrorBehaviour) { }
 		public FilteredLogger(ILogEvents logger, params LogLevel[] allowedLogLevels) : this(logger, (IEnumerable<LogLevel>)allowedLogLevels) { }
 
@@ -45,7 +45,7 @@ namespace HappyLogging.Implementations
 		public void Log(LogEventDetails message)
 		{
 			if (message == null)
-				throw new ArgumentNullException(nameof(messages));
+				throw new ArgumentNullException(nameof(message));
 
 			if (!AllowedLogLevels.Contains(message.LogLevel))
 				return;
