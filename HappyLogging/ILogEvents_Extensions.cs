@@ -33,7 +33,7 @@ namespace HappyLogging
 		/// Wrap logging request in a try..catch and swallow any exception - this is an extension method that guarantees the exception will be caught, regardless
 		/// of the logger implementation
 		/// </summary>
-		public static void LogIgnoringAnyError(this ILogEvents logger, LogLevel logLevel, Func<string> contentGenerator, Exception exception)
+		public static void LogIgnoringAnyError(this ILogEvents logger, LogLevel logLevel, Func<string> contentGenerator, Exception exception = null)
 		{
 			if (logger == null)
 				throw new ArgumentNullException("logger");
@@ -41,16 +41,40 @@ namespace HappyLogging
 			LogIgnoringAnyError(logger, logLevel, DateTime.Now, Thread.CurrentThread.ManagedThreadId, contentGenerator, exception);
 		}
 
-		/// <summary>
-		/// Wrap logging request in a try..catch and swallow any exception - this is an extension method that guarantees the exception will be caught, regardless
-		/// of the logger implementation
-		/// </summary>
-		public static void LogIgnoringAnyError(this ILogEvents logger, LogLevel logLevel, Func<string> contentGenerator)
+		public static void Log(this ILogEvents logger, LogLevel logLevel, DateTime logDate, int managedThreadId, string content, Exception exception)
 		{
 			if (logger == null)
 				throw new ArgumentNullException("logger");
 
-			LogIgnoringAnyError(logger, logLevel, contentGenerator, null);
+			logger.Log(new[] { new LogEventDetails(logLevel, logDate, managedThreadId, content, exception) });
+		}
+
+		/// <summary>
+		/// Wrap logging request in a try..catch and swallow any exception - this is an extension method that guarantees the exception will be caught, regardless
+		/// of the logger implementation
+		/// </summary>
+		public static void LogIgnoringAnyError(this ILogEvents logger, LogLevel logLevel, DateTime logDate, int managedThreadId, string content, Exception exception)
+		{
+			if (logger == null)
+				throw new ArgumentNullException("logger");
+
+			try
+			{
+				Log(logger, logLevel, logDate, managedThreadId, content, exception);
+			}
+			catch { }
+		}
+
+		/// <summary>
+		/// Wrap logging request in a try..catch and swallow any exception - this is an extension method that guarantees the exception will be caught, regardless
+		/// of the logger implementation
+		/// </summary>
+		public static void LogIgnoringAnyError(this ILogEvents logger, LogLevel logLevel, string content, Exception exception = null)
+		{
+			if (logger == null)
+				throw new ArgumentNullException("logger");
+
+			LogIgnoringAnyError(logger, logLevel, DateTime.Now, Thread.CurrentThread.ManagedThreadId, content, exception);
 		}
 
 		/// <summary>
@@ -67,7 +91,7 @@ namespace HappyLogging
 			if (error == null)
 				return;
 
-			LogIgnoringAnyError(logger, LogLevel.Error, () => "", error);
+			LogIgnoringAnyError(logger, LogLevel.Error, "", error);
 		}
 	}
 }
