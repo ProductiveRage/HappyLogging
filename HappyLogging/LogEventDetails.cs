@@ -13,6 +13,7 @@ namespace HappyLogging
 			ContentGenerator = null;
 		}
 		public LogEventDetails(LogLevel logLevel, DateTime logDate, int managedThreadId, Func<string> contentGenerator, Exception optionalException)
+			: this(logLevel, logDate, managedThreadId, optionalException)
 		{
 			if (contentGenerator == null)
 				throw new ArgumentNullException(nameof(contentGenerator));
