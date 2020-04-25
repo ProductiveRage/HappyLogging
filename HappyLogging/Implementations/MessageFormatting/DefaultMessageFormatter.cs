@@ -55,18 +55,9 @@ namespace HappyLogging
 			{
 				if (!string.IsNullOrWhiteSpace(content))
 					detailedContent.Append(" - ");
-				detailedContent.Append(message.OptionalException.Message);
-				detailedContent.AppendLine();
-				detailedContent.Append(message.OptionalException.StackTrace);
-				var baseException = message.OptionalException.GetBaseException();
-				if ((baseException != null) && (baseException != message.OptionalException))
-				{
-					detailedContent.AppendFormat(" - Base Exception: {0}", baseException.Message);
-					detailedContent.AppendLine();
-					detailedContent.Append(baseException.StackTrace);
-				}
+				detailedContent.Append(message.OptionalException.ToString());
 			}
-			return (detailedContent.ToString());
+			return detailedContent.ToString();
 		}
 	}
 }
