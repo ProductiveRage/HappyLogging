@@ -1,7 +1,16 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Express 2012 for Windows Desktop
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29324.140
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HappyLogging", "HappyLogging\HappyLogging.csproj", "{5ADFC0BF-1B60-4F68-9081-9DFA284A990C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{FC2E6FB2-AC02-4E3B-886D-1E20DC165F7D}"
+	ProjectSection(SolutionItems) = preProject
+		HappyLogging.nuspec = HappyLogging.nuspec
+		LICENSE.txt = LICENSE.txt
+		ReadMe.md = ReadMe.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -16,5 +25,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A60F01BA-009C-4F39-B813-96004EBEB403}
 	EndGlobalSection
 EndGlobal
