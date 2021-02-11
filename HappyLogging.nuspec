@@ -16,6 +16,7 @@
   </metadata>
   <files>
     <file src="HappyLogging.dll" target="lib\net40" />
+    <file src="HappyLogging.pdb" target="lib\net40" />
     <file src="HappyLogging.xml" target="lib\net40" />
   </files>
 </package>
